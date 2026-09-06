@@ -79,6 +79,8 @@ button {
 button:hover:not(:disabled) { background: var(--blue-deep); }
 button:disabled { cursor: not-allowed; opacity: .55; }
 button:focus-visible { outline: .24rem solid var(--coral); outline-offset: .18rem; }
+.secondary-button { color: var(--blue-deep); background: var(--cream); box-shadow: inset 0 0 0 .14rem var(--blue); }
+.secondary-button:hover:not(:disabled) { color: white; }
 
 .stats { display: flex; gap: 1.5rem; margin: 0; }
 .stats div { min-width: 5.5rem; }

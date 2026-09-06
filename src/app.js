@@ -1,7 +1,17 @@
 import { createGame, selectTile } from './puzzle.js';
 
 const PUZZLE_SIZE = 5;
-const IMAGE_URL = './assets/bluey-puzzle.png';
+const DEFAULT_IMAGE_URL = './assets/bluey-puzzle.png';
+
+export function isUsableImageFile(file) {
+  return Boolean(file && file.size > 0 && /^image\//i.test(file.type));
+}
+
+export function imageAspectRatio(width, height) {
+  return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0
+    ? width / height
+    : 16 / 9;
+}
 
 export function formatElapsed(milliseconds) {
   const elapsedSeconds = Math.floor(milliseconds / 1_000);
@@ -15,6 +25,8 @@ if (typeof document !== 'undefined') {
   const puzzle = document.querySelector('#puzzle');
   const startButton = document.querySelector('#start-button');
   const restartButton = document.querySelector('#restart-button');
+  const uploadButton = document.querySelector('#upload-button');
+  const imageUpload = document.querySelector('#image-upload');
   const moves = document.querySelector('#moves');
   const timer = document.querySelector('#timer');
   const previewImage = document.querySelector('#preview-image');
@@ -27,11 +39,20 @@ if (typeof document !== 'undefined') {
   let game = null;
   let startedAt = 0;
   let timerInterval = null;
+  let currentImageUrl = DEFAULT_IMAGE_URL;
+  let uploadedImageUrl = null;
 
-  previewImage.src = IMAGE_URL;
+  previewImage.src = currentImageUrl;
   previewImage.addEventListener('error', () => {
+    imageError.textContent = 'We could not load that image. Please choose another image and try again.';
     imageError.hidden = false;
   });
+
+  function applyImageDimensions(width, height) {
+    const ratio = String(imageAspectRatio(width, height));
+    previewImage.style.aspectRatio = ratio;
+    puzzle.style.aspectRatio = ratio;
+  }
 
   function announce(message) {
     liveStatus.textContent = message;
@@ -70,12 +91,12 @@ if (typeof document !== 'undefined') {
         button.type = 'button';
         button.className = 'puzzle-piece';
         button.dataset.index = String(index);
-        button.style.backgroundImage = `url("${IMAGE_URL}")`;
         button.style.backgroundSize = `${PUZZLE_SIZE * 100}% ${PUZZLE_SIZE * 100}%`;
         button.addEventListener('click', () => selectPiece(index));
         puzzle.append(button);
       }
 
+      button.style.backgroundImage = `url("${currentImageUrl}")`;
       button.style.backgroundPosition = `${column * 25}% ${row * 25}%`;
       button.setAttribute('aria-label', `Piece ${tile + 1}, position ${index + 1} of ${PUZZLE_SIZE * PUZZLE_SIZE}`);
       button.setAttribute('aria-pressed', String(game.selectedIndex === index));
@@ -126,7 +147,55 @@ if (typeof document !== 'undefined') {
     announce('New puzzle started. Select two pieces to swap them.');
   }
 
+  function loadUploadedImage(file) {
+    if (!isUsableImageFile(file)) {
+      imageError.textContent = 'Please choose a non-empty image file.';
+      imageError.hidden = false;
+      announce('The selected file is not a usable image.');
+      return;
+    }
+
+    const candidateUrl = URL.createObjectURL(file);
+    const candidate = new Image();
+
+    candidate.addEventListener('load', () => {
+      if (uploadedImageUrl) {
+        URL.revokeObjectURL(uploadedImageUrl);
+      }
+
+      uploadedImageUrl = candidateUrl;
+      currentImageUrl = candidateUrl;
+      previewImage.src = currentImageUrl;
+      imageError.hidden = true;
+      applyImageDimensions(candidate.naturalWidth, candidate.naturalHeight);
+      startGame();
+      announce('New image loaded. The puzzle has started.');
+    }, { once: true });
+
+    candidate.addEventListener('error', () => {
+      URL.revokeObjectURL(candidateUrl);
+      imageError.textContent = 'We could not read that image. Please choose another image.';
+      imageError.hidden = false;
+      announce('The selected image could not be read.');
+    }, { once: true });
+
+    candidate.src = candidateUrl;
+  }
+
   restartButton.disabled = true;
   startButton.addEventListener('click', startGame);
   restartButton.addEventListener('click', startGame);
+  uploadButton.addEventListener('click', () => imageUpload.click());
+  imageUpload.addEventListener('change', () => {
+    const [file] = imageUpload.files;
+    imageUpload.value = '';
+    if (file) {
+      loadUploadedImage(file);
+    }
+  });
+  window.addEventListener('beforeunload', () => {
+    if (uploadedImageUrl) {
+      URL.revokeObjectURL(uploadedImageUrl);
+    }
+  });
 }

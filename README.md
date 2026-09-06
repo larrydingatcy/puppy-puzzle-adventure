@@ -16,6 +16,8 @@ Then open [http://localhost:8000](http://localhost:8000) in a modern browser.
 
 Select one puzzle piece, then select a different piece to swap the two. Selecting the same piece a second time cancels the selection and does not add a move. The board has 25 pieces arranged in a 5×5 difficulty grid; the move counter and timer begin when you start or restart a game.
 
+Select **Upload image** to choose a picture from your device. The image stays in your browser, is not uploaded anywhere, and starts a fresh puzzle while preserving the full image ratio. Refreshing the page restores the default image.
+
 ## Test
 
 Run the dependency-free Node test suite with:
@@ -26,7 +28,7 @@ npm test
 
 ## Puzzle image
 
-The temporary local image is at `assets/bluey-puzzle.png`. To replace it with an image you are authorized to use, replace that file while keeping the same path (or update the centralized `IMAGE_URL` value in `src/app.js`). The current temporary image was sourced from the [official Bluey wallpapers page](https://www.bluey.tv/wallpapers/).
+The temporary local image is at `assets/bluey-puzzle.png`. To replace it with an image you are authorized to use, replace that file while keeping the same path (or update the centralized `DEFAULT_IMAGE_URL` value in `src/app.js`). The current temporary image was sourced from the [official Bluey wallpapers page](https://www.bluey.tv/wallpapers/).
 
 ## Rights and use
 
