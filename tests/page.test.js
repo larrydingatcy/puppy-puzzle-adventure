@@ -3,9 +3,16 @@ import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { formatElapsed } from '../src/app.js';
 
 const testsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.dirname(testsDirectory);
+
+test('formatElapsed formats elapsed milliseconds as total minutes and seconds', () => {
+  assert.equal(formatElapsed(0), '00:00');
+  assert.equal(formatElapsed(65_000), '01:05');
+  assert.equal(formatElapsed(3_605_000), '60:05');
+});
 
 test('static page exposes the required puzzle contract and local image', async () => {
   const html = await readFile(path.join(projectDirectory, 'index.html'), 'utf8');
