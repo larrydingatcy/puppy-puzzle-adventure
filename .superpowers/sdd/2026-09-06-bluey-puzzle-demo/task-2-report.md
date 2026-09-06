@@ -75,3 +75,43 @@ Result: 4 tests passed, 0 failed. This includes the new page contract and all ex
 ## Concerns
 
 None for Task 2. `styles.css` and the behavior in `src/app.js` are intentionally not implemented here, per scope.
+
+## Review fix round 1
+
+Addressed the review finding that the preview image URL was hard-coded in `index.html`. The preview `<img>` now has no `src`; Task 3's `src/app.js` owns the centralized image URL and will assign it at runtime. Added a contract assertion that the HTML does not contain `./assets/bluey-puzzle.png`, while retaining the non-empty local asset assertion.
+
+### Fix-round TDD evidence
+
+RED command:
+
+```text
+node --test tests/page.test.js
+```
+
+Relevant RED output:
+
+```text
+✖ static page exposes the required puzzle contract and local image
+AssertionError [ERR_ASSERTION]: image URL must be centralized in src/app.js
+ℹ tests 1
+ℹ pass 0
+ℹ fail 1
+```
+
+After removing the HTML `src`, GREEN commands:
+
+```text
+node --test tests/page.test.js
+npm test
+git diff --check
+```
+
+Results:
+
+```text
+focused: 1 passed, 0 failed
+full suite: 4 passed, 0 failed
+diff check: passed
+```
+
+Fix commit: `fix: centralize puzzle image URL` (includes this report update).
