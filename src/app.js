@@ -49,36 +49,38 @@ if (typeof document !== 'undefined') {
   }
 
   function renderBoard() {
-    puzzle.replaceChildren();
-
     if (!game) {
+      puzzle.replaceChildren();
       return;
     }
 
+    const requiresNewBoard = puzzle.children.length !== game.tiles.length;
+
+    if (requiresNewBoard) {
+      puzzle.replaceChildren();
+    }
+
     for (const [index, tile] of game.tiles.entries()) {
-      const button = document.createElement('button');
+      let button = puzzle.children[index];
       const column = tile % PUZZLE_SIZE;
       const row = Math.floor(tile / PUZZLE_SIZE);
 
-      button.type = 'button';
-      button.className = 'puzzle-piece';
-      button.dataset.index = String(index);
-      button.style.backgroundImage = `url("${IMAGE_URL}")`;
-      button.style.backgroundSize = `${PUZZLE_SIZE * 100}% ${PUZZLE_SIZE * 100}%`;
+      if (requiresNewBoard) {
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'puzzle-piece';
+        button.dataset.index = String(index);
+        button.style.backgroundImage = `url("${IMAGE_URL}")`;
+        button.style.backgroundSize = `${PUZZLE_SIZE * 100}% ${PUZZLE_SIZE * 100}%`;
+        button.addEventListener('click', () => selectPiece(index));
+        puzzle.append(button);
+      }
+
       button.style.backgroundPosition = `${column * 25}% ${row * 25}%`;
       button.setAttribute('aria-label', `Piece ${tile + 1}, position ${index + 1} of ${PUZZLE_SIZE * PUZZLE_SIZE}`);
       button.setAttribute('aria-pressed', String(game.selectedIndex === index));
-
-      if (game.selectedIndex === index) {
-        button.classList.add('is-selected');
-      }
-
-      if (game.status === 'completed') {
-        button.disabled = true;
-      }
-
-      button.addEventListener('click', () => selectPiece(index));
-      puzzle.append(button);
+      button.classList.toggle('is-selected', game.selectedIndex === index);
+      button.disabled = game.status === 'completed';
     }
   }
 
@@ -103,12 +105,12 @@ if (typeof document !== 'undefined') {
       return;
     }
 
-    if (game.selectedIndex === null && previousSelection !== null) {
-      announce(`Pieces swapped. ${game.moves} moves.`);
-    } else if (game.selectedIndex === index) {
-      announce(`Piece ${index + 1} selected. Choose another piece to swap.`);
+    if (previousSelection === null) {
+      announce(`Position ${index + 1} selected. Choose another piece to swap.`);
+    } else if (previousSelection === index) {
+      announce('Selection cleared.');
     } else {
-      announce('Piece selection cleared.');
+      announce(`Pieces swapped. ${game.moves} moves.`);
     }
   }
 

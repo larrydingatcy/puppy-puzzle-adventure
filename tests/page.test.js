@@ -34,7 +34,11 @@ test('static page exposes the required puzzle contract and local image', async (
   }
 
   assert.match(html, /<script[^>]+type=["']module["'][^>]+src=["']\.\/src\/app\.js["']/);
-  assert.match(html, /<link rel="icon" href="data:,">/, 'page must avoid a missing favicon request');
+  assert.match(
+    html,
+    /<link\b(?=[^>]*\brel\s*=\s*["']icon["'])(?=[^>]*\bhref\s*=\s*["']data:,["'])[^>]*>/i,
+    'page must avoid a missing favicon request',
+  );
   assert.doesNotMatch(html, /\.\/assets\/bluey-puzzle\.png/, 'image URL must be centralized in src/app.js');
   assert.match(html, /5×5/);
   assert.match(html, /non-commercial/i);

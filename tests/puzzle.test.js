@@ -40,3 +40,21 @@ test('creates a game and transitions through tile selection', () => {
   assert.equal(completed.moves, 1);
   assert.equal(completed.status, 'completed');
 });
+
+test('ignores selection attempts after the game is completed', () => {
+  const completed = {
+    size: 5,
+    tiles: createSolvedTiles(5),
+    selectedIndex: null,
+    moves: 3,
+    status: 'completed',
+  };
+
+  const next = selectTile(completed, 4);
+
+  assert.equal(next, completed);
+  assert.deepEqual(next.tiles, createSolvedTiles(5));
+  assert.equal(next.selectedIndex, null);
+  assert.equal(next.moves, 3);
+  assert.equal(next.status, 'completed');
+});
