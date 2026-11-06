@@ -41,6 +41,8 @@ if (typeof document !== 'undefined') {
   const completionDialog = document.querySelector('#completion-dialog');
   const finalMoves = document.querySelector('#final-moves');
   const finalTime = document.querySelector('#final-time');
+  const finalDifficulty = document.querySelector('#final-difficulty');
+  const completionAchievements = document.querySelector('#completion-achievements');
   const liveStatus = document.querySelector('#live-status');
   const difficultyControls = document.querySelector('#difficulty-controls');
   const difficultyButtons = [...difficultyControls.querySelectorAll('button[data-size]')];
@@ -205,6 +207,7 @@ if (typeof document !== 'undefined') {
       return;
     }
 
+    suppressNextClick = false;
     dragSourceElement = event.currentTarget;
     dragState = createDragState(
       Number(dragSourceElement.dataset.index),
@@ -261,9 +264,11 @@ if (typeof document !== 'undefined') {
 
     if (state.dragged) {
       suppressNextClick = true;
-      setTimeout(() => {
-        suppressNextClick = false;
-      }, 0);
+      if (!cancelled) {
+        setTimeout(() => {
+          suppressNextClick = false;
+        }, 0);
+      }
     }
 
     clearDragPresentation();
@@ -278,6 +283,7 @@ if (typeof document !== 'undefined') {
 
   puzzle.addEventListener('pointerup', (event) => endPointerGesture(event));
   puzzle.addEventListener('pointercancel', (event) => endPointerGesture(event, true));
+  puzzle.addEventListener('lostpointercapture', (event) => endPointerGesture(event, true));
 
   function completeGame() {
     stopTimer();
@@ -289,11 +295,14 @@ if (typeof document !== 'undefined') {
     renderBestRecords();
     finalMoves.textContent = String(game.moves);
     finalTime.textContent = timer.textContent;
+    finalDifficulty.textContent = `${selectedSize}×${selectedSize}`;
     const achievements = [
       result.newBestMoves ? 'New best move count!' : '',
       result.newBestTime ? 'New best time!' : '',
       recordsSaved ? '' : 'Best results could not be saved on this device.',
     ].filter(Boolean).join(' ');
+    completionAchievements.textContent = achievements;
+    completionAchievements.hidden = achievements.length === 0;
     announce(`Puzzle complete in ${game.moves} moves and ${timer.textContent}.${achievements ? ` ${achievements}` : ''}`);
     renderBoard();
     completionDialog.showModal();

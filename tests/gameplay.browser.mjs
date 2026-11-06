@@ -73,6 +73,8 @@ const solveCurrentPuzzle = () => evaluate(`(() => {
     dialogOpen: document.querySelector('#completion-dialog').open,
     finalMoves: Number(document.querySelector('#final-moves').textContent),
     finalTime: document.querySelector('#final-time').textContent,
+    finalDifficulty: document.querySelector('#final-difficulty')?.textContent ?? null,
+    achievements: document.querySelector('#completion-achievements')?.textContent ?? null,
   };
 })()`);
 
@@ -100,6 +102,23 @@ try {
   await runBrowser('click', '#restart-button');
   const first = await centerOf('.puzzle-piece[data-index="0"]');
   const second = await centerOf('.puzzle-piece[data-index="1"]');
+  await evaluate(`document.querySelector('.puzzle-piece[data-index="0"]').addEventListener(
+    'pointerdown',
+    (event) => { window.__testPointerId = event.pointerId; },
+    { once: true },
+  )`);
+  await moveMouse(first);
+  await runBrowser('mouse', 'down', 'left');
+  await moveMouse(second);
+  await evaluate(`document.querySelector('.puzzle-piece[data-index="0"]').dispatchEvent(
+    new PointerEvent('lostpointercapture', { bubbles: true, pointerId: window.__testPointerId }),
+  )`);
+  await runBrowser('mouse', 'up', 'left');
+  assert.deepEqual(await evaluate(`({
+    moves: document.querySelector('#moves').textContent,
+    status: document.querySelector('#live-status').textContent,
+  })`), { moves: '0', status: 'Drag cancelled. No pieces were moved.' });
+
   await moveMouse(first);
   await runBrowser('mouse', 'down', 'left');
   await moveMouse(second);
@@ -176,6 +195,9 @@ try {
   assert.equal(firstCompletion.moves, firstCompletion.swaps);
   assert.equal(firstCompletion.finalMoves, firstCompletion.swaps);
   assert.match(firstCompletion.finalTime, /^\d{2}:\d{2}$/);
+  assert.equal(firstCompletion.finalDifficulty, '5×5');
+  assert.match(firstCompletion.achievements, /New best move count!/);
+  assert.match(firstCompletion.achievements, /New best time!/);
   assert.deepEqual(await evaluate(`(() => {
     const stored = JSON.parse(localStorage.getItem('puppy-puzzle-best-v1'));
     return {

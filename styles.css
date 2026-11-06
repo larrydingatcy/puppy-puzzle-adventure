@@ -131,6 +131,7 @@ dialog {
 
 dialog::backdrop { background: rgb(18 71 102 / 55%); }
 .dialog-actions { margin-top: 1.25rem; }
+.completion-achievements { padding: .75rem; border-radius: .65rem; color: var(--blue-deep); font-weight: 900; background: var(--cream); }
 footer { padding: 0 1rem 2rem; text-align: center; font-size: .8rem; }
 
 @keyframes confetti-pop {

@@ -43,6 +43,8 @@ test('static page exposes the required puzzle contract and local image', async (
     'completion-dialog',
     'final-moves',
     'final-time',
+    'final-difficulty',
+    'completion-achievements',
     'live-status',
     'upload-button',
     'image-upload',
