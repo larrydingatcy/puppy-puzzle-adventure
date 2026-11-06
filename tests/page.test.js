@@ -29,6 +29,8 @@ test('image aspect ratio preserves valid dimensions and falls back safely', () =
 
 test('static page exposes the required puzzle contract and local image', async () => {
   const html = await readFile(path.join(projectDirectory, 'index.html'), 'utf8');
+  const readme = await readFile(path.join(projectDirectory, 'README.md'), 'utf8');
+  const app = await readFile(path.join(projectDirectory, 'src', 'app.js'), 'utf8');
 
   for (const id of [
     'puzzle',
@@ -44,6 +46,15 @@ test('static page exposes the required puzzle contract and local image', async (
     'live-status',
     'upload-button',
     'image-upload',
+    'difficulty-controls',
+    'difficulty-5',
+    'difficulty-7',
+    'difficulty-9',
+    'current-difficulty',
+    'best-moves',
+    'best-time',
+    'replay-button',
+    'next-difficulty-button',
   ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `missing #${id}`);
   }
@@ -54,12 +65,22 @@ test('static page exposes the required puzzle contract and local image', async (
     /<link\b(?=[^>]*\brel\s*=\s*["']icon["'])(?=[^>]*\bhref\s*=\s*["']data:,["'])[^>]*>/i,
     'page must avoid a missing favicon request',
   );
-  assert.doesNotMatch(html, /\.\/assets\/bluey-puzzle\.png/, 'image URL must be centralized in src/app.js');
-  assert.match(html, /5×5/);
+  assert.match(html, /Puppy Puzzle Adventure/);
+  for (const size of [5, 7, 9]) {
+    assert.match(
+      html,
+      new RegExp(`<button[^>]+id=["']difficulty-${size}["'][^>]+aria-pressed=["'](?:true|false)["']`, 'i'),
+      `difficulty ${size} must be a pressed-state button`,
+    );
+  }
   assert.match(html, /<input[^>]+id=["']image-upload["'][^>]+type=["']file["'][^>]+accept=["']image\/\*["']/i);
-  assert.match(html, /non-commercial/i);
-  assert.match(html, /Bluey.*(?:Ludo Studio|BBC Studios)|(?:Ludo Studio|BBC Studios).*Bluey/i);
+  assert.match(html, /stays on (?:your )?device|never leaves (?:your )?(?:browser|device)/i);
+  assert.match(app, /\.\/assets\/puppy-puzzle\.png/);
 
-  const image = await stat(path.join(projectDirectory, 'assets', 'bluey-puzzle.png'));
+  for (const [name, contents] of [['index.html', html], ['README.md', readme], ['src/app.js', app]]) {
+    assert.doesNotMatch(contents, /Bluey|Ludo Studio|BBC Studios/i, `${name} must use original branding`);
+  }
+
+  const image = await stat(path.join(projectDirectory, 'assets', 'puppy-puzzle.png'));
   assert.ok(image.size > 0, 'local puzzle image must be non-empty');
 });

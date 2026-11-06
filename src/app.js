@@ -1,7 +1,11 @@
-import { createGame, selectTile } from './puzzle.js';
+import {
+  SUPPORTED_SIZES,
+  createGame,
+  selectTile,
+  tileBackgroundPosition,
+} from './puzzle.js';
 
-const PUZZLE_SIZE = 5;
-const DEFAULT_IMAGE_URL = './assets/bluey-puzzle.png';
+export const DEFAULT_IMAGE_URL = './assets/puppy-puzzle.png';
 
 export function isUsableImageFile(file) {
   return Boolean(file && file.size > 0 && /^image\//i.test(file.type));
@@ -35,8 +39,14 @@ if (typeof document !== 'undefined') {
   const finalMoves = document.querySelector('#final-moves');
   const finalTime = document.querySelector('#final-time');
   const liveStatus = document.querySelector('#live-status');
+  const difficultyControls = document.querySelector('#difficulty-controls');
+  const difficultyButtons = [...difficultyControls.querySelectorAll('button[data-size]')];
+  const currentDifficulty = document.querySelector('#current-difficulty');
+  const replayButton = document.querySelector('#replay-button');
+  const nextDifficultyButton = document.querySelector('#next-difficulty-button');
 
   let game = null;
+  let selectedSize = SUPPORTED_SIZES[0];
   let startedAt = 0;
   let timerInterval = null;
   let currentImageUrl = DEFAULT_IMAGE_URL;
@@ -83,22 +93,21 @@ if (typeof document !== 'undefined') {
 
     for (const [index, tile] of game.tiles.entries()) {
       let button = puzzle.children[index];
-      const column = tile % PUZZLE_SIZE;
-      const row = Math.floor(tile / PUZZLE_SIZE);
+      const { xPercent, yPercent } = tileBackgroundPosition(tile, game.size);
 
       if (requiresNewBoard) {
         button = document.createElement('button');
         button.type = 'button';
         button.className = 'puzzle-piece';
         button.dataset.index = String(index);
-        button.style.backgroundSize = `${PUZZLE_SIZE * 100}% ${PUZZLE_SIZE * 100}%`;
+        button.style.backgroundSize = `${game.size * 100}% ${game.size * 100}%`;
         button.addEventListener('click', () => selectPiece(index));
         puzzle.append(button);
       }
 
       button.style.backgroundImage = `url("${currentImageUrl}")`;
-      button.style.backgroundPosition = `${column * 25}% ${row * 25}%`;
-      button.setAttribute('aria-label', `Piece ${tile + 1}, position ${index + 1} of ${PUZZLE_SIZE * PUZZLE_SIZE}`);
+      button.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+      button.setAttribute('aria-label', `Piece ${tile + 1}, position ${index + 1} of ${game.size * game.size}`);
       button.setAttribute('aria-pressed', String(game.selectedIndex === index));
       button.classList.toggle('is-selected', game.selectedIndex === index);
       button.disabled = game.status === 'completed';
@@ -137,14 +146,32 @@ if (typeof document !== 'undefined') {
 
   function startGame() {
     stopTimer();
-    game = createGame(PUZZLE_SIZE);
+    if (completionDialog.open) {
+      completionDialog.close();
+    }
+    game = createGame(selectedSize);
     startedAt = performance.now();
     moves.textContent = '0';
     updateTimer();
     timerInterval = setInterval(updateTimer, 1_000);
     restartButton.disabled = false;
+    puzzle.style.setProperty('--puzzle-size', String(selectedSize));
+    puzzle.dataset.size = String(selectedSize);
+    puzzle.setAttribute('aria-label', `${selectedSize * selectedSize}-cell ${selectedSize}×${selectedSize} puzzle board`);
+    currentDifficulty.textContent = `${selectedSize}×${selectedSize}`;
+    for (const button of difficultyButtons) {
+      button.setAttribute('aria-pressed', String(Number(button.dataset.size) === selectedSize));
+    }
     renderBoard();
-    announce('New puzzle started. Select two pieces to swap them.');
+    announce(`New ${selectedSize}×${selectedSize} puzzle started. Select two pieces to swap them.`);
+  }
+
+  function selectDifficulty(size) {
+    if (size === selectedSize && game) {
+      return;
+    }
+    selectedSize = size;
+    startGame();
   }
 
   function loadUploadedImage(file) {
@@ -185,6 +212,14 @@ if (typeof document !== 'undefined') {
   restartButton.disabled = true;
   startButton.addEventListener('click', startGame);
   restartButton.addEventListener('click', startGame);
+  for (const button of difficultyButtons) {
+    button.addEventListener('click', () => selectDifficulty(Number(button.dataset.size)));
+  }
+  replayButton.addEventListener('click', startGame);
+  nextDifficultyButton.addEventListener('click', () => {
+    const currentIndex = SUPPORTED_SIZES.indexOf(selectedSize);
+    selectDifficulty(SUPPORTED_SIZES[(currentIndex + 1) % SUPPORTED_SIZES.length]);
+  });
   uploadButton.addEventListener('click', () => imageUpload.click());
   imageUpload.addEventListener('change', () => {
     const [file] = imageUpload.files;

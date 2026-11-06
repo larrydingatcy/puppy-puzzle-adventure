@@ -49,7 +49,7 @@ h1, h2 { color: var(--blue-deep); }
   box-shadow: var(--card-shadow);
 }
 
-.game-card > h2, .controls, .stats, .puzzle-grid, #live-status, #image-error { grid-column: 1 / -1; }
+.game-card > h2, .difficulty-controls, .controls, .privacy-note, .stats, .puzzle-grid, #live-status, #image-error { grid-column: 1 / -1; }
 
 figure { margin: 0; }
 
@@ -63,7 +63,11 @@ figure { margin: 0; }
 
 figcaption { margin-top: .4rem; font-size: .875rem; }
 
-.controls { display: flex; flex-wrap: wrap; gap: .75rem; }
+.difficulty-controls, .controls, .dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.difficulty-controls > span { margin-right: .25rem; font-weight: 900; }
+.difficulty-controls button[aria-pressed="false"] { color: var(--blue-deep); background: var(--cream); box-shadow: inset 0 0 0 .14rem var(--blue); }
+.difficulty-controls button[aria-pressed="true"] { box-shadow: 0 0 0 .2rem white, 0 0 0 .4rem var(--blue-deep); }
+.privacy-note { margin: -.5rem 0 0; font-size: .9rem; }
 
 button {
   border: 0;
@@ -82,14 +86,14 @@ button:focus-visible { outline: .24rem solid var(--coral); outline-offset: .18re
 .secondary-button { color: var(--blue-deep); background: var(--cream); box-shadow: inset 0 0 0 .14rem var(--blue); }
 .secondary-button:hover:not(:disabled) { color: white; }
 
-.stats { display: flex; gap: 1.5rem; margin: 0; }
+.stats { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; margin: 0; }
 .stats div { min-width: 5.5rem; }
 .stats dt { font-size: .85rem; font-weight: 800; }
 .stats dd { margin: .2rem 0 0; font-size: 1.4rem; font-weight: 900; }
 
 .puzzle-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(var(--puzzle-size, 5), minmax(0, 1fr));
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border: .35rem solid var(--blue-deep);
@@ -100,7 +104,7 @@ button:focus-visible { outline: .24rem solid var(--coral); outline-offset: .18re
 .puzzle-piece {
   min-width: 0;
   padding: 0;
-  border: 1px solid rgb(255 255 255 / 70%);
+  border: clamp(.5px, calc(3px / var(--puzzle-size, 5)), 1px) solid rgb(255 255 255 / 70%);
   border-radius: 0;
   background-repeat: no-repeat;
 }
@@ -121,6 +125,7 @@ dialog {
 }
 
 dialog::backdrop { background: rgb(18 71 102 / 55%); }
+.dialog-actions { margin-top: 1.25rem; }
 footer { padding: 0 1rem 2rem; text-align: center; font-size: .8rem; }
 
 @keyframes confetti-pop {

@@ -1,6 +1,6 @@
-# Bluey 5×5 Puzzle Demo
+# Puppy Puzzle Adventure
 
-A small, dependency-free browser puzzle demo. Restore the picture by swapping pieces in a fixed 5×5 grid.
+A dependency-free browser puzzle game with 5×5, 7×7, and 9×9 difficulties. Restore the original puppy illustration—or a picture from your own device—by swapping pieces.
 
 ## Run locally
 
@@ -14,7 +14,7 @@ Then open [http://localhost:8000](http://localhost:8000) in a modern browser.
 
 ## Play
 
-Select one puzzle piece, then select a different piece to swap the two. Selecting the same piece a second time cancels the selection and does not add a move. The board has 25 pieces arranged in a 5×5 difficulty grid; the move counter and timer begin when you start or restart a game.
+Choose a difficulty, select one puzzle piece, then select a different piece to swap the two. Selecting the same piece a second time cancels the selection and does not add a move. The move counter and timer begin when you start, restart, or change difficulty.
 
 Select **Upload image** to choose a picture from your device. The image stays in your browser, is not uploaded anywhere, and starts a fresh puzzle while preserving the full image ratio. Refreshing the page restores the default image.
 
@@ -26,10 +26,10 @@ Run the dependency-free Node test suite with:
 npm test
 ```
 
-## Puzzle image
+## Puzzle artwork
 
-The temporary local image is at `assets/bluey-puzzle.png`. To replace it with an image you are authorized to use, replace that file while keeping the same path (or update the centralized `DEFAULT_IMAGE_URL` value in `src/app.js`). The current temporary image was sourced from the [official Bluey wallpapers page](https://www.bluey.tv/wallpapers/).
+The default artwork is an original generated cartoon illustration stored at `assets/puppy-puzzle.png`. It contains generic puppy characters and no third-party branding, text, or logos.
 
-## Rights and use
+## Privacy
 
-This project is a non-commercial demo only. Bluey and related characters are the copyright and trademarks of Ludo Studio, BBC Studios, and other respective rights holders. Do not publish, distribute commercially, or otherwise use the included image without the appropriate permission; obtain authorization or replace it with properly licensed artwork before any formal release.
+Pictures selected with **Upload image** stay on your device. They are read locally by the browser, are never sent to a server, and disappear when the page is refreshed.
