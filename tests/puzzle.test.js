@@ -1,12 +1,31 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  SUPPORTED_SIZES,
   createGame,
   createSolvedTiles,
+  isSupportedSize,
   isSolved,
   selectTile,
   shuffleTiles,
+  tileBackgroundPosition,
 } from '../src/puzzle.js';
+
+test('supports only the three designed puzzle sizes', () => {
+  assert.deepEqual(SUPPORTED_SIZES, [5, 7, 9]);
+  assert.equal(isSupportedSize(5), true);
+  assert.equal(isSupportedSize(7), true);
+  assert.equal(isSupportedSize(9), true);
+  assert.equal(isSupportedSize(6), false);
+  assert.equal(createGame(7, () => 0).tiles.length, 49);
+  assert.equal(createGame(9, () => 0).tiles.length, 81);
+  assert.throws(() => createGame(6), /Unsupported puzzle size/);
+});
+
+test('calculates tile backgrounds for any supported grid', () => {
+  assert.deepEqual(tileBackgroundPosition(24, 7), { xPercent: 50, yPercent: 50 });
+  assert.throws(() => tileBackgroundPosition(0, 6), /Unsupported puzzle size/);
+});
 
 test('creates solved tile order', () => {
   assert.deepEqual(createSolvedTiles(5), Array.from({ length: 25 }, (_, i) => i));

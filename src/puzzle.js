@@ -1,5 +1,28 @@
+export const SUPPORTED_SIZES = Object.freeze([5, 7, 9]);
+
+export function isSupportedSize(size) {
+  return SUPPORTED_SIZES.includes(size);
+}
+
+function assertSupportedSize(size) {
+  if (!isSupportedSize(size)) {
+    throw new RangeError(`Unsupported puzzle size: ${size}`);
+  }
+}
+
 export function createSolvedTiles(size) {
+  assertSupportedSize(size);
   return Array.from({ length: size * size }, (_, index) => index);
+}
+
+export function tileBackgroundPosition(tile, size) {
+  assertSupportedSize(size);
+  const denominator = size - 1;
+
+  return {
+    xPercent: ((tile % size) / denominator) * 100,
+    yPercent: (Math.floor(tile / size) / denominator) * 100,
+  };
 }
 
 export function isSolved(tiles) {
@@ -22,6 +45,7 @@ export function shuffleTiles(tiles, random = Math.random) {
 }
 
 export function createGame(size, random = Math.random) {
+  assertSupportedSize(size);
   return {
     size,
     tiles: shuffleTiles(createSolvedTiles(size), random),
