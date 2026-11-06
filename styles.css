@@ -99,6 +99,8 @@ button:focus-visible { outline: .24rem solid var(--coral); outline-offset: .18re
   border: .35rem solid var(--blue-deep);
   border-radius: 1rem;
   background: var(--blue-deep);
+  touch-action: none;
+  user-select: none;
 }
 
 .puzzle-piece {
@@ -110,6 +112,8 @@ button:focus-visible { outline: .24rem solid var(--coral); outline-offset: .18re
 }
 
 .puzzle-piece.is-selected { position: relative; z-index: 1; outline: .25rem solid var(--coral); outline-offset: -.25rem; }
+.puzzle-piece.is-dragging { position: relative; z-index: 2; opacity: .72; transform: scale(.96); }
+.puzzle-piece.is-drop-target { position: relative; z-index: 1; outline: .22rem solid #ffd43b; outline-offset: -.22rem; }
 .puzzle-piece:disabled { opacity: 1; }
 .puzzle-grid:has(.puzzle-piece:disabled) { animation: confetti-pop 800ms ease-out both; }
 

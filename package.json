@@ -1,9 +1,9 @@
 {
-  "name": "bluey-puzzle-demo",
+  "name": "puppy-puzzle-adventure",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "test:browser": "node tests/keyboard-swap.browser.mjs"
+    "test:browser": "node tests/gameplay.browser.mjs"
   }
 }

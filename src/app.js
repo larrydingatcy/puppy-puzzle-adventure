@@ -4,6 +4,7 @@ import {
   selectTile,
   tileBackgroundPosition,
 } from './puzzle.js';
+import { createDragState, finishDrag, updateDragState } from './drag.js';
 
 export const DEFAULT_IMAGE_URL = './assets/puppy-puzzle.png';
 
@@ -51,6 +52,10 @@ if (typeof document !== 'undefined') {
   let timerInterval = null;
   let currentImageUrl = DEFAULT_IMAGE_URL;
   let uploadedImageUrl = null;
+  let dragState = null;
+  let dragSourceElement = null;
+  let dragTargetElement = null;
+  let suppressNextClick = false;
 
   previewImage.src = currentImageUrl;
   previewImage.addEventListener('error', () => {
@@ -101,7 +106,14 @@ if (typeof document !== 'undefined') {
         button.className = 'puzzle-piece';
         button.dataset.index = String(index);
         button.style.backgroundSize = `${game.size * 100}% ${game.size * 100}%`;
-        button.addEventListener('click', () => selectPiece(index));
+        button.addEventListener('click', () => {
+          if (suppressNextClick) {
+            suppressNextClick = false;
+            return;
+          }
+          selectPiece(index);
+        });
+        button.addEventListener('pointerdown', beginPointerGesture);
         puzzle.append(button);
       }
 
@@ -113,6 +125,116 @@ if (typeof document !== 'undefined') {
       button.disabled = game.status === 'completed';
     }
   }
+
+  function pieceAtPoint(x, y) {
+    const element = document.elementFromPoint(x, y)?.closest('.puzzle-piece');
+    return element && puzzle.contains(element) ? element : null;
+  }
+
+  function clearDragPresentation() {
+    dragSourceElement?.classList.remove('is-dragging');
+    dragSourceElement?.removeAttribute('aria-grabbed');
+    dragTargetElement?.classList.remove('is-drop-target');
+    dragSourceElement = null;
+    dragTargetElement = null;
+  }
+
+  function updateDragPresentation() {
+    dragSourceElement?.classList.toggle('is-dragging', dragState?.dragged === true);
+    if (dragSourceElement && dragState?.dragged) {
+      dragSourceElement.setAttribute('aria-grabbed', 'true');
+    }
+
+    const nextTarget = dragState?.dragged && dragState.targetIndex !== null
+      ? puzzle.children[dragState.targetIndex]
+      : null;
+    if (dragTargetElement !== nextTarget) {
+      dragTargetElement?.classList.remove('is-drop-target');
+      dragTargetElement = nextTarget;
+      if (dragTargetElement !== dragSourceElement) {
+        dragTargetElement?.classList.add('is-drop-target');
+      }
+    }
+  }
+
+  function beginPointerGesture(event) {
+    if (!game || game.status === 'completed' || dragState !== null) {
+      return;
+    }
+
+    dragSourceElement = event.currentTarget;
+    dragState = createDragState(
+      Number(dragSourceElement.dataset.index),
+      event.pointerId,
+      event.clientX,
+      event.clientY,
+    );
+    dragSourceElement.setPointerCapture(event.pointerId);
+  }
+
+  puzzle.addEventListener('pointermove', (event) => {
+    if (!dragState) {
+      return;
+    }
+
+    const target = pieceAtPoint(event.clientX, event.clientY);
+    dragState = updateDragState(
+      dragState,
+      event.pointerId,
+      event.clientX,
+      event.clientY,
+      target ? Number(target.dataset.index) : null,
+    );
+    updateDragPresentation();
+  });
+
+  function swapFromDrag(sourceIndex, targetIndex) {
+    game = selectTile({ ...game, selectedIndex: null }, sourceIndex);
+    game = selectTile(game, targetIndex);
+    moves.textContent = String(game.moves);
+    renderBoard();
+    puzzle.children[sourceIndex]?.focus();
+
+    if (game.status === 'completed') {
+      completeGame();
+      return;
+    }
+
+    announce(`Pieces swapped by drag. ${game.moves} moves.`);
+  }
+
+  function endPointerGesture(event, cancelled = false) {
+    if (!dragState) {
+      return;
+    }
+
+    const state = dragState;
+    const target = cancelled ? null : pieceAtPoint(event.clientX, event.clientY);
+    const action = finishDrag(
+      state,
+      event.pointerId,
+      target ? Number(target.dataset.index) : null,
+    );
+
+    if (state.dragged) {
+      suppressNextClick = true;
+      setTimeout(() => {
+        suppressNextClick = false;
+      }, 0);
+    }
+
+    clearDragPresentation();
+    dragState = null;
+
+    if (action.type === 'swap') {
+      swapFromDrag(action.sourceIndex, action.targetIndex);
+    } else if (action.type === 'cancel') {
+      announce('Drag cancelled. No pieces were moved.');
+    }
+  }
+
+  puzzle.addEventListener('pointerup', (event) => endPointerGesture(event));
+  puzzle.addEventListener('pointercancel', (event) => endPointerGesture(event, true));
 
   function completeGame() {
     stopTimer();
@@ -146,6 +268,8 @@ if (typeof document !== 'undefined') {
 
   function startGame() {
     stopTimer();
+    clearDragPresentation();
+    dragState = null;
     if (completionDialog.open) {
       completionDialog.close();
     }
