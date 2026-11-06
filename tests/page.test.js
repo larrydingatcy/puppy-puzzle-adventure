@@ -68,6 +68,11 @@ test('static page exposes the required puzzle contract and local image', async (
     'page must avoid a missing favicon request',
   );
   assert.match(html, /Puppy Puzzle Adventure/);
+  assert.match(
+    html,
+    /<img[^>]+id=["']preview-image["'][^>]+src=["']\.\/assets\/puppy-puzzle\.png["']/i,
+    'the preview must have a static fallback when modules cannot run',
+  );
   for (const size of [5, 7, 9]) {
     assert.match(
       html,
