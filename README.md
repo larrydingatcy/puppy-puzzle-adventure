@@ -28,6 +28,10 @@ Run the dependency-free Node test suite with:
 npm test
 ```
 
+## Publish with GitHub Pages
+
+The included GitHub Actions workflow runs the Node test suite and publishes the repository root whenever `main` is updated. It can also be started manually from the repository's **Actions** tab. In **Settings → Pages**, keep the source set to **GitHub Actions**.
+
 ## Puzzle artwork
 
 The default artwork is an original generated cartoon illustration stored at `assets/puppy-puzzle.png`. It contains generic puppy characters and no third-party branding, text, or logos.
