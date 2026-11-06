@@ -109,6 +109,7 @@ button:focus-visible { outline: .24rem solid var(--coral); outline-offset: .18re
   border: clamp(.5px, calc(3px / var(--puzzle-size, 5)), 1px) solid rgb(255 255 255 / 70%);
   border-radius: 0;
   background-repeat: no-repeat;
+  transition: opacity 120ms ease, transform 120ms ease;
 }
 
 .puzzle-piece.is-selected { position: relative; z-index: 1; outline: .25rem solid var(--coral); outline-offset: -.25rem; }
@@ -142,6 +143,8 @@ footer { padding: 0 1rem 2rem; text-align: center; font-size: .8rem; }
   main { width: min(100% - 1rem, 68rem); padding: 1rem 0; }
   .game-card { grid-template-columns: 1fr; padding: 1rem; border-radius: 1rem; }
   .stats { justify-content: space-between; }
+  .stats div { min-width: 4.5rem; }
+  .difficulty-controls button { flex: 1 1 4rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

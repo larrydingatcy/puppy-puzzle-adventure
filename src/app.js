@@ -5,8 +5,10 @@ import {
   tileBackgroundPosition,
 } from './puzzle.js';
 import { createDragState, finishDrag, updateDragState } from './drag.js';
+import { normalizeBestRecords, updateBestRecords } from './records.js';
 
 export const DEFAULT_IMAGE_URL = './assets/puppy-puzzle.png';
+export const BEST_RECORDS_KEY = 'puppy-puzzle-best-v1';
 
 export function isUsableImageFile(file) {
   return Boolean(file && file.size > 0 && /^image\//i.test(file.type));
@@ -43,6 +45,8 @@ if (typeof document !== 'undefined') {
   const difficultyControls = document.querySelector('#difficulty-controls');
   const difficultyButtons = [...difficultyControls.querySelectorAll('button[data-size]')];
   const currentDifficulty = document.querySelector('#current-difficulty');
+  const bestMoves = document.querySelector('#best-moves');
+  const bestTime = document.querySelector('#best-time');
   const replayButton = document.querySelector('#replay-button');
   const nextDifficultyButton = document.querySelector('#next-difficulty-button');
 
@@ -56,6 +60,8 @@ if (typeof document !== 'undefined') {
   let dragSourceElement = null;
   let dragTargetElement = null;
   let suppressNextClick = false;
+  let recordsPersistenceAvailable = true;
+  let bestRecords = loadBestRecords();
 
   previewImage.src = currentImageUrl;
   previewImage.addEventListener('error', () => {
@@ -75,6 +81,43 @@ if (typeof document !== 'undefined') {
 
   function updateTimer() {
     timer.textContent = formatElapsed(performance.now() - startedAt);
+  }
+
+  function loadBestRecords() {
+    let serialized;
+    try {
+      serialized = localStorage.getItem(BEST_RECORDS_KEY);
+    } catch {
+      recordsPersistenceAvailable = false;
+      return normalizeBestRecords(null);
+    }
+
+    if (!serialized) {
+      return normalizeBestRecords(null);
+    }
+
+    try {
+      return normalizeBestRecords(JSON.parse(serialized));
+    } catch {
+      return normalizeBestRecords(null);
+    }
+  }
+
+  function saveBestRecords() {
+    try {
+      localStorage.setItem(BEST_RECORDS_KEY, JSON.stringify(bestRecords));
+      recordsPersistenceAvailable = true;
+      return true;
+    } catch {
+      recordsPersistenceAvailable = false;
+      return false;
+    }
+  }
+
+  function renderBestRecords() {
+    const record = bestRecords[selectedSize];
+    bestMoves.textContent = record.bestMoves === null ? '—' : String(record.bestMoves);
+    bestTime.textContent = record.bestTimeMs === null ? '—' : formatElapsed(record.bestTimeMs);
   }
 
   function stopTimer() {
@@ -238,10 +281,20 @@ if (typeof document !== 'undefined') {
 
   function completeGame() {
     stopTimer();
-    updateTimer();
+    const elapsedMs = performance.now() - startedAt;
+    timer.textContent = formatElapsed(elapsedMs);
+    const result = updateBestRecords(bestRecords, selectedSize, game.moves, elapsedMs);
+    bestRecords = result.records;
+    const recordsSaved = saveBestRecords();
+    renderBestRecords();
     finalMoves.textContent = String(game.moves);
     finalTime.textContent = timer.textContent;
-    announce(`Puzzle complete in ${game.moves} moves and ${timer.textContent}.`);
+    const achievements = [
+      result.newBestMoves ? 'New best move count!' : '',
+      result.newBestTime ? 'New best time!' : '',
+      recordsSaved ? '' : 'Best results could not be saved on this device.',
+    ].filter(Boolean).join(' ');
+    announce(`Puzzle complete in ${game.moves} moves and ${timer.textContent}.${achievements ? ` ${achievements}` : ''}`);
     renderBoard();
     completionDialog.showModal();
   }
@@ -283,6 +336,7 @@ if (typeof document !== 'undefined') {
     puzzle.dataset.size = String(selectedSize);
     puzzle.setAttribute('aria-label', `${selectedSize * selectedSize}-cell ${selectedSize}×${selectedSize} puzzle board`);
     currentDifficulty.textContent = `${selectedSize}×${selectedSize}`;
+    renderBestRecords();
     for (const button of difficultyButtons) {
       button.setAttribute('aria-pressed', String(Number(button.dataset.size) === selectedSize));
     }
@@ -342,7 +396,8 @@ if (typeof document !== 'undefined') {
   replayButton.addEventListener('click', startGame);
   nextDifficultyButton.addEventListener('click', () => {
     const currentIndex = SUPPORTED_SIZES.indexOf(selectedSize);
-    selectDifficulty(SUPPORTED_SIZES[(currentIndex + 1) % SUPPORTED_SIZES.length]);
+    selectedSize = SUPPORTED_SIZES[Math.min(currentIndex + 1, SUPPORTED_SIZES.length - 1)];
+    startGame();
   });
   uploadButton.addEventListener('click', () => imageUpload.click());
   imageUpload.addEventListener('change', () => {
@@ -357,4 +412,5 @@ if (typeof document !== 'undefined') {
       URL.revokeObjectURL(uploadedImageUrl);
     }
   });
+  renderBestRecords();
 }
