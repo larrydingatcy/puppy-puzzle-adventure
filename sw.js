@@ -1,10 +1,10 @@
-const CACHE = 'phonics-picnic-v2';
+const CACHE = 'phonics-picnic-v3';
 const FILES = [
   './',
   './index.html',
-  './styles.css?v=20261112',
-  './src/app.js?v=20261112',
-  './src/learning.js?v=20261112',
+  './styles.css?v=2026111202',
+  './src/app.js?v=2026111202',
+  './src/learning.js?v=2026111202',
   './manifest.webmanifest',
 ];
 

@@ -5,6 +5,7 @@ await import('../src/learning.js');
 const {
   SKILLS,
   WORDS,
+  phonemeFilesFor,
   buildChoiceRound,
   buildSession,
   createDefaultProgress,
@@ -48,4 +49,26 @@ test('progress records attempts without negative scores', () => {
   const wrong = updateProgress(right, 'initial', false);
   assert.deepEqual(wrong.initial, { correct: 1, attempts: 2 });
   assert.deepEqual(progress.initial, { correct: 0, attempts: 0 });
+});
+
+test('priority letters use pure phonemes instead of spoken letter names', () => {
+  assert.deepEqual(phonemeFilesFor('t'), ['t']);
+  assert.deepEqual(phonemeFilesFor('n'), ['n']);
+  assert.deepEqual(phonemeFilesFor('c'), ['k']);
+  assert.deepEqual(phonemeFilesFor('k'), ['k']);
+  assert.deepEqual(phonemeFilesFor('ck'), ['k']);
+  assert.deepEqual(phonemeFilesFor('e'), ['e']);
+  assert.deepEqual(phonemeFilesFor('u'), ['uh']);
+  assert.deepEqual(phonemeFilesFor('i'), ['i']);
+  assert.deepEqual(phonemeFilesFor('x'), ['k', 's']);
+});
+
+test('every recorded-sound question has an audio mapping', () => {
+  const spoken = WORDS.filter((word) => ['letter', 'initial', 'blend'].includes(word.skill));
+  for (const word of spoken) {
+    const sounds = word.skill === 'blend' ? word.phonemes : [word.focus];
+    for (const sound of sounds) {
+      assert.ok(phonemeFilesFor(sound).length, `missing pure audio for /${sound}/ in ${word.word}`);
+    }
+  }
 });

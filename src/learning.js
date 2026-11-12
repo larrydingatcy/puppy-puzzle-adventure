@@ -6,6 +6,20 @@ const SKILLS = [
   { id: 'tricky', name: 'Tricky words', short: 'Tricky Treasure', icon: '💎', color: '#b06b16', priority: 3 },
 ];
 
+// Filenames map graphemes used by the game to isolated, human-recorded phonemes.
+// In particular, c, k and ck share /k/; x is the two-phoneme sequence /k/ /s/.
+const PURE_SOUND_FILES = {
+  a: ['ae'], b: ['b'], c: ['k'], d: ['d'], e: ['e'], f: ['f'], g: ['g'], h: ['h'],
+  i: ['i'], j: ['dj'], k: ['k'], l: ['l'], m: ['m'], n: ['n'], o: ['o'], p: ['p'],
+  r: ['r'], s: ['s'], t: ['t'], u: ['uh'], v: ['v'], w: ['w'], x: ['k', 's'],
+  y: ['y'], z: ['z'], sh: ['sh'], ch: ['ch'], th: ['th'], ck: ['k'], ng: ['ng'],
+  oo: ['uu'],
+};
+
+function phonemeFilesFor(sound) {
+  return PURE_SOUND_FILES[sound] || [];
+}
+
 const make = (word, emoji, skill, focus, phonemes, rhyme = '') => ({
   id: `${skill}-${word}`,
   word,
@@ -137,10 +151,12 @@ function buildSession(pool = WORDS, progress = createDefaultProgress(), length =
 }
 
 globalThis.PhonicsLearning = {
+  PURE_SOUND_FILES,
   SKILLS,
   WORDS,
   buildChoiceRound,
   buildSession,
   createDefaultProgress,
+  phonemeFilesFor,
   updateProgress,
 };

@@ -17,6 +17,8 @@ test('page exposes a touch-friendly phonics journey', async () => {
   assert.match(html, /Sound Match/);
   assert.match(html, /Spell & Treasure/);
   assert.match(html, /to, the, no, go and I/);
+  assert.match(html, /Pure phoneme recordings/);
+  assert.match(html, /CC BY-SA 3\.0/);
   assert.match(html, /id=["']sound-toggle["']/);
   assert.match(html, /defer src=["']\.\/src\/learning\.js\?v=\d+["']/);
   assert.match(html, /defer src=["']\.\/src\/app\.js\?v=\d+["']/);
@@ -32,7 +34,7 @@ test('the game remains installable and offline-ready', async () => {
   assert.match(html, /manifest\.webmanifest/);
   assert.equal(JSON.parse(manifest).display, 'standalone');
   assert.match(worker, /src\/learning\.js/);
-  assert.match(worker, /phonics-picnic-v2/);
+  assert.match(worker, /phonics-picnic-v3/);
   assert.match(worker, /self\.skipWaiting/);
   assert.match(worker, /self\.clients\.claim/);
 });

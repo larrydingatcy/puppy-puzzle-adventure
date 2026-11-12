@@ -5,10 +5,12 @@ const {
   buildChoiceRound,
   buildSession,
   createDefaultProgress,
+  phonemeFilesFor,
   updateProgress,
 } = globalThis.PhonicsLearning;
 
 const STORAGE_KEY = 'phonics-picnic-v1';
+const PURE_SOUND_AUDIO_ROOT = 'https://raw.githubusercontent.com/Nico-Sanchez/schwa/720907443ddd1811756dc4a73b686c774fc277d7/site/audio/';
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
@@ -34,6 +36,7 @@ let correctFirstTry = 0;
 let missedThisRound = false;
 let locked = false;
 let audioContext;
+const pureSoundBuffers = new Map();
 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -62,30 +65,76 @@ function playChime(kind = 'tap') {
 }
 
 function speak(text, options = {}) {
-  if (!state.sound || !('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-GB';
-  utterance.rate = options.rate || .72;
-  utterance.pitch = options.pitch || 1.08;
-  const voice = speechSynthesis.getVoices().find((item) => /^en-GB/i.test(item.lang))
-    || speechSynthesis.getVoices().find((item) => /^en/i.test(item.lang));
-  if (voice) utterance.voice = voice;
-  const button = $('#listen-button');
-  utterance.onstart = () => button?.classList.add('is-speaking');
-  utterance.onend = () => button?.classList.remove('is-speaking');
-  speechSynthesis.speak(utterance);
+  if (!state.sound || !('speechSynthesis' in window)) return Promise.resolve();
+  return new Promise((resolve) => {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-GB';
+    utterance.rate = options.rate || .72;
+    utterance.pitch = options.pitch || 1.08;
+    const voice = speechSynthesis.getVoices().find((item) => /^en-GB/i.test(item.lang))
+      || speechSynthesis.getVoices().find((item) => /^en/i.test(item.lang));
+    if (voice) utterance.voice = voice;
+    const button = $('#listen-button');
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      button?.classList.remove('is-speaking');
+      resolve();
+    };
+    utterance.onstart = () => button?.classList.add('is-speaking');
+    utterance.onend = finish;
+    utterance.onerror = finish;
+    speechSynthesis.speak(utterance);
+    window.setTimeout(finish, Math.max(1800, text.length * 105));
+  });
 }
 
-const soundSay = {
-  a: 'ah', b: 'b', c: 'k', d: 'd', e: 'eh', f: 'fff', g: 'g', h: 'h', i: 'ih', j: 'j',
-  k: 'k', l: 'lll', m: 'mmm', n: 'nnn', o: 'oh', p: 'p', r: 'rrr', s: 'sss', t: 't',
-  u: 'uh', v: 'vvv', w: 'w', x: 'ks', z: 'zzz', sh: 'shhh', ch: 'ch', th: 'th', ck: 'k', ng: 'ng',
-};
+function getAudioContext() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  audioContext ||= new AudioContextClass();
+  if (audioContext.state === 'suspended') audioContext.resume();
+  return audioContext;
+}
 
-function saySounds(word, includeWord = false) {
-  const pieces = word.phonemes.map((sound) => soundSay[sound] || sound).join(' ... ');
-  speak(includeWord ? `${pieces}. ${word.word}.` : pieces, { rate: .58 });
+function loadPureSound(file) {
+  if (!pureSoundBuffers.has(file)) {
+    const context = getAudioContext();
+    pureSoundBuffers.set(file, context
+      ? fetch(`${PURE_SOUND_AUDIO_ROOT}${file}.mp3`)
+        .then((response) => {
+          if (!response.ok) throw new Error(`Could not load /${file}/`);
+          return response.arrayBuffer();
+        })
+        .then((bytes) => context.decodeAudioData(bytes))
+        .catch(() => null)
+      : Promise.resolve(null));
+  }
+  return pureSoundBuffers.get(file);
+}
+
+async function playPhonemes(sounds, wholeWord = '') {
+  if (!state.sound) return;
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  const context = getAudioContext();
+  const files = sounds.flatMap(phonemeFilesFor);
+  const buffers = (await Promise.all(files.map(loadPureSound))).filter(Boolean);
+  if (!context || buffers.length !== files.length) {
+    if (wholeWord) await speak(wholeWord);
+    return;
+  }
+  let startAt = context.currentTime + .04;
+  buffers.forEach((buffer) => {
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);
+    source.start(startAt);
+    startAt += buffer.duration + .07;
+  });
+  await new Promise((resolve) => window.setTimeout(resolve, Math.max(0, (startAt - context.currentTime) * 1000)));
+  if (wholeWord) await speak(wholeWord, { rate: .64 });
 }
 
 function updateSoundButton() {
@@ -105,6 +154,10 @@ function showScreen(id) {
 }
 
 function startGame(skillId = null) {
+  getAudioContext();
+  ['t', 'n', 'c', 'k', 'ck', 'e', 'u', 'i', 'a', 'o', 's', 'm', 'p', 'd', 'f', 'b', 'g', 'h', 'r', 'l', 'v', 'w', 'z', 'sh', 'ch', 'th', 'ng']
+    .flatMap(phonemeFilesFor)
+    .forEach(loadPureSound);
   if (skillId) {
     const pool = WORDS.filter((word) => word.skill === skillId);
     session = Array.from({ length: 6 }, (_, index) => buildChoiceRound(pool[index % pool.length], WORDS));
@@ -132,15 +185,24 @@ function promptFor(round) {
   return `What rhymes with <em>${answer.word}</em>?`;
 }
 
-function instructionFor(round) {
-  if (round.answer.skill === 'letter') return `Find the spelling for ${soundSay[round.answer.focus] || round.answer.focus}.`;
-  if (round.answer.skill === 'tricky') return `Find ${round.answer.word}. ${round.answer.word}.`;
-  if (round.answer.skill === 'spell') return `Find the word ${round.answer.word}.`;
-  if (round.answer.skill === 'rhyme') return `Find a word that rhymes with ${round.answer.word}. ${round.answer.word}.`;
-  if (round.answer.skill === 'initial') return `Find the word that starts with ${soundSay[round.answer.focus] || round.answer.focus}.`;
-  if (round.answer.skill === 'digraph') return `Find the word with ${soundSay[round.answer.focus] || round.answer.focus}.`;
-  saySounds(round.answer);
-  return null;
+async function playInstruction(round) {
+  const { answer } = round;
+  if (answer.skill === 'letter') {
+    await speak('Listen. Find the spelling for this sound.');
+    return playPhonemes([answer.focus]);
+  }
+  if (answer.skill === 'initial') {
+    await speak('Listen. Which word starts with this sound?');
+    return playPhonemes([answer.focus]);
+  }
+  if (answer.skill === 'digraph') {
+    await speak('Listen. Which word has this sound?');
+    return playPhonemes([answer.focus]);
+  }
+  if (answer.skill === 'blend') return playPhonemes(answer.phonemes, answer.word);
+  if (answer.skill === 'tricky') return speak(`Find ${answer.word}. ${answer.word}.`);
+  if (answer.skill === 'spell') return speak(`Find the word ${answer.word}.`);
+  return speak(`Find a word that rhymes with ${answer.word}. ${answer.word}.`);
 }
 
 function renderRound() {
@@ -159,10 +221,7 @@ function renderRound() {
   $('#sound-train').hidden = round.answer.skill !== 'blend';
   $('#sound-train').innerHTML = round.answer.phonemes.map((sound, index) => `${index ? '<i>+</i>' : ''}<span>${sound}</span>`).join('');
   $('#listen-button b').textContent = round.answer.skill === 'blend' ? 'Hear the sounds' : 'Hear the clue';
-  $('#listen-button').onclick = () => {
-    const sentence = instructionFor(round);
-    if (sentence) speak(sentence);
-  };
+  $('#listen-button').onclick = () => playInstruction(round);
   $('#choices').replaceChildren();
   round.choices.forEach((choice) => {
     const button = document.createElement('button');
