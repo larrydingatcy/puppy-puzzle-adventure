@@ -40,6 +40,7 @@ class FakeElement {
 }
 
 function createBrowser() {
+  const timers = [];
   const ids = [
     'start-button', 'play-again', 'sound-toggle', 'reset-progress', 'skill-label',
     'prompt-title', 'guide-face', 'guide-line', 'round-count', 'progress-dots',
@@ -91,12 +92,12 @@ function createBrowser() {
     confirm: () => true,
     scrollTo() {},
     addEventListener() {},
-    setTimeout: () => 0,
+    setTimeout(callback) { timers.push(callback); return timers.length; },
     clearTimeout() {},
   };
   browser.window = browser;
   browser.globalThis = browser;
-  return { browser, elements, screens, goButtons };
+  return { browser, elements, screens, goButtons, timers };
 }
 
 test('classic browser scripts load together and every main page is interactive', async () => {
@@ -104,7 +105,7 @@ test('classic browser scripts load together and every main page is interactive',
     readFile(path.join(root, 'src/learning.js'), 'utf8'),
     readFile(path.join(root, 'src/app.js'), 'utf8'),
   ]);
-  const { browser, elements, screens, goButtons } = createBrowser();
+  const { browser, elements, screens, goButtons, timers } = createBrowser();
   const context = vm.createContext(browser);
 
   vm.runInContext(learning, context, { filename: 'learning.js' });
@@ -113,6 +114,23 @@ test('classic browser scripts load together and every main page is interactive',
   elements['start-button'].click();
   assert.ok(screens.find((screen) => screen.id === 'game-screen').classList.contains('is-active'));
   assert.equal(elements.choices.children.length, 3, 'Play should render three answer choices');
+
+  const skillsSeen = new Set();
+  for (let round = 0; round < 8; round += 1) {
+    skillsSeen.add(elements['skill-label'].textContent);
+    const choices = [...elements.choices.children];
+    choices.forEach((choice) => choice.click());
+    assert.ok(choices.some((choice) => choice.classList.contains('is-right')), `round ${round + 1} should accept an answer`);
+    const advance = timers.pop();
+    assert.equal(typeof advance, 'function');
+    advance();
+  }
+  for (const label of ['SOUND MATCH', 'SOUND SAFARI', 'BLEND-A-BUS', 'SPELL IT', 'TRICKY TREASURE']) {
+    assert.ok(skillsSeen.has(label), `session should exercise ${label}`);
+  }
+  assert.ok(screens.find((screen) => screen.id === 'result-screen').classList.contains('is-active'));
+  assert.match(elements['result-copy'].textContent, /You solved 8 sound puzzles/);
+  assert.match(elements['sound-badges'].innerHTML, /<span>/);
 
   goButtons.find((button) => button.dataset.go === 'map-screen').click();
   assert.ok(screens.find((screen) => screen.id === 'map-screen').classList.contains('is-active'));
