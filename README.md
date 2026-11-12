@@ -1,45 +1,31 @@
-# Puppy Puzzle Adventure
+# Phonics Picnic
 
-A dependency-free browser puzzle game with 5×5, 7×7, and 9×9 difficulties. Restore the original puppy illustration—or a picture from your own device—by swapping pieces.
+一个根据孩子学校 phonics 测评定制、面向 5 岁儿童的英语自然拼读小游戏。每次游戏约 5 分钟，包含：
 
-## Run locally
+- 首音辨认（First sounds）
+- CVC 拼读（CVC blending）
+- 测评重点字母音 `t / n / c / k / ck / e / u / i`
+- 简单词阅读与拼写
+- Tricky words：`to / the / no / go / I`
+- 英文语音提示、温和重试、无扣分机制
+- 本地保存进度，并自动增加薄弱技能出现频率
+- 家长学习概览与线下练习建议
 
-From this project directory, start the static server:
+## 运行
+
+这是一个无依赖的静态网页。建议在项目目录启动任意本地静态服务器，例如：
 
 ```bash
-python3 -m http.server 8000
+python3 -m http.server 4173
 ```
 
-Then open [http://localhost:8000](http://localhost:8000) in a modern browser.
+然后访问 `http://localhost:4173`。
 
-## Play
-
-Choose the 5×5, 7×7, or 9×9 difficulty. Drag one piece onto another to swap them, or select two pieces with a click, tap, or keyboard. Selecting the same piece a second time cancels the selection and does not add a move. The move counter and timer begin when you start, restart, or change difficulty.
-
-Your best move count and best time are stored separately for each difficulty in this browser. No account or network request is used. If browser storage is unavailable, the puzzle still works and explains that the result could not be saved after completion.
-
-Select **Upload image** to choose a picture from your device. The image stays in your browser, is not uploaded anywhere, and starts a fresh puzzle while preserving the full image ratio. Refreshing the page restores the default image.
-
-## Test
-
-Run the dependency-free Node test suite with:
+## 测试
 
 ```bash
 npm test
+npm run check
 ```
 
-## Publish with GitHub Pages
-
-The included GitHub Actions workflow runs the Node test suite and publishes the repository root whenever `main` is updated. It can also be started manually from the repository's **Actions** tab. In **Settings → Pages**, keep the source set to **GitHub Actions**.
-
-## Puzzle artwork
-
-The default artwork is an original generated cartoon illustration stored at `assets/puppy-puzzle.png`. It contains generic puppy characters and no third-party branding, text, or logos.
-
-## Privacy
-
-Pictures selected with **Upload image** stay on your device. They are read locally by the browser, are never sent to a server, and disappear when the page is refreshed.
-
-## iPad and touch devices
-
-Open the published link in Safari and play directly—there is nothing to install or sign in to. Dragging is limited to the puzzle board so the rest of the page still scrolls normally. Portrait and landscape layouts support all 81 pieces without horizontal page scrolling.
+题库和测评权重位于 `src/learning.js`。初始优先级来自学校测评，之后会继续根据游戏答题情况自适应。
