@@ -1,0 +1,10 @@
+{
+  "name": "Phonics Picnic",
+  "short_name": "Phonics Picnic",
+  "description": "A gentle phonics game for early readers.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8e8",
+  "theme_color": "#fff4d6",
+  "orientation": "any"
+}
