@@ -1,9 +1,9 @@
 {
-  "name": "phonics-picnic",
+  "name": "puppy-puzzle-adventure",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/learning.test.js tests/page.test.js tests/runtime.test.js",
-    "check": "node --check src/app.js && node --check src/learning.js && node --check sw.js"
+    "test": "node --test",
+    "test:browser": "node tests/gameplay.browser.mjs"
   }
 }

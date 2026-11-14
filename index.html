@@ -2,109 +2,70 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-    <meta name="theme-color" content="#fff4d6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Phonics Picnic">
-    <title>Phonics Picnic</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧺</text></svg>">
-    <link rel="manifest" href="./manifest.webmanifest">
-    <link rel="stylesheet" href="./styles.css?v=2026111202">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Puppy Puzzle Adventure</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <div class="sky-things" aria-hidden="true"><i></i><i></i><i></i></div>
-    <header class="app-header">
-      <button class="logo" type="button" data-go="home-screen" aria-label="Home">
-        <span class="logo-basket">🧺</span>
-        <span><strong>Phonics Picnic</strong><small>listen · blend · play</small></span>
-      </button>
-      <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true"><span>🔊</span><b>Sound on</b></button>
-    </header>
-
     <main>
-      <section id="home-screen" class="screen is-active" aria-labelledby="home-title">
-        <div class="hero">
-          <div class="hero-copy">
-            <p class="eyebrow">A LITTLE ADVENTURE FOR BIG READERS</p>
-            <h1 id="home-title">Pack your sounds.<br><em>Let’s picnic!</em></h1>
-            <p class="intro">Eight tiny games. Lots of listening. Just right for age 5.</p>
-            <button id="start-button" class="primary-button" type="button"><span>Let’s play!</span><small>about 5 minutes</small></button>
-            <p class="grownup-note">Grown-ups: the game repeats the skills that need more practice.</p>
-          </div>
-          <div class="hero-art" aria-hidden="true">
-            <span class="sun">☀️</span><span class="cloud">☁️</span>
-            <div class="hill back"></div><div class="hill front"></div>
-            <span class="tree">🌳</span><span class="blanket"></span>
-            <span class="picnic">🧺</span><span class="friend">🐻</span><span class="bee">🐝</span>
-          </div>
+      <header class="title-area">
+        <p class="eyebrow">A friendly picture puzzle</p>
+        <h1>Puppy Puzzle Adventure</h1>
+        <p>Choose a challenge, then swap pieces to restore the cheerful puppy picture.</p>
+      </header>
+
+      <section class="game-card" aria-labelledby="puzzle-heading">
+        <h2 id="puzzle-heading">Restore the picture</h2>
+
+        <figure>
+          <img id="preview-image" src="./assets/puppy-puzzle.png" alt="Three cartoon puppies playing in a sunny meadow">
+          <figcaption>Preview image</figcaption>
+        </figure>
+        <p id="image-error" role="alert" hidden>We could not load the puzzle image. Please reload the page and try again.</p>
+
+        <div id="difficulty-controls" class="difficulty-controls" aria-label="Puzzle difficulty">
+          <span>Difficulty</span>
+          <button id="difficulty-5" type="button" aria-pressed="true" data-size="5">5×5</button>
+          <button id="difficulty-7" type="button" aria-pressed="false" data-size="7">7×7</button>
+          <button id="difficulty-9" type="button" aria-pressed="false" data-size="9">9×9</button>
         </div>
 
-        <section class="today-card" aria-labelledby="today-title">
-          <div><p class="eyebrow">TODAY’S PICNIC</p><h2 id="today-title">Practice from your school check-in</h2></div>
-          <div class="skill-pills" aria-label="Today’s phonics skills">
-            <span>🔤 t · n · c · k · ck · e · u · i</span><span>🚌 CVC blending</span><span>🧩 Simple spelling</span><span>💎 Tricky words</span>
-          </div>
-        </section>
-
-        <div class="trail-cards">
-          <article><span class="trail-number green">1</span><div><b>Sound Match</b><small>Match letters to sounds</small></div><i>🔤</i></article>
-          <article><span class="trail-number coral">2</span><div><b>Sound Safari</b><small>Hear the first sound</small></div><i>👂</i></article>
-          <article><span class="trail-number purple">3</span><div><b>Blend-a-Bus</b><small>Push sounds together</small></div><i>🚌</i></article>
-          <article><span class="trail-number pink">4</span><div><b>Spell & Treasure</b><small>Simple and tricky words</small></div><i>💎</i></article>
+        <div class="controls" aria-label="Puzzle controls">
+          <button id="start-button" type="button">Start puzzle</button>
+          <button id="restart-button" type="button">Restart</button>
+          <button id="upload-button" class="secondary-button" type="button">Upload image</button>
+          <input id="image-upload" type="file" accept="image/*" hidden>
         </div>
-      </section>
+        <p class="privacy-note">Your uploaded image stays on your device and never leaves your browser.</p>
 
-      <section id="game-screen" class="screen" aria-labelledby="prompt-title">
-        <div class="game-bar">
-          <button class="round-button" type="button" data-go="home-screen" aria-label="Leave game">×</button>
-          <div class="progress-dots" id="progress-dots" aria-label="Game progress"></div>
-          <span id="round-count">1 / 8</span>
-        </div>
-        <article class="game-card">
-          <div class="guide"><span id="guide-face">🐻</span><p id="guide-line">Listen carefully!</p></div>
-          <p id="skill-label" class="skill-label">SOUND SAFARI</p>
-          <h2 id="prompt-title">Which one starts with <em>/s/</em>?</h2>
-          <button id="listen-button" class="listen-button" type="button"><span>🔊</span><b>Hear it</b></button>
-          <div id="sound-train" class="sound-train" hidden></div>
-          <div id="choices" class="choices"></div>
-          <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
-        </article>
-      </section>
+        <dl class="stats" aria-label="Puzzle progress">
+          <div><dt>Difficulty</dt><dd id="current-difficulty">5×5</dd></div>
+          <div><dt>Moves</dt><dd id="moves">0</dd></div>
+          <div><dt>Time</dt><dd id="timer">00:00</dd></div>
+          <div><dt>Best moves</dt><dd id="best-moves">—</dd></div>
+          <div><dt>Best time</dt><dd id="best-time">—</dd></div>
+        </dl>
 
-      <section id="map-screen" class="screen" aria-labelledby="map-title">
-        <div class="section-title"><div><p class="eyebrow">YOUR SOUND MAP</p><h2 id="map-title">Picnic trail</h2></div><span>🗺️</span></div>
-        <p class="section-intro">Tap a stop to practise just that skill.</p>
-        <div id="skill-map" class="skill-map"></div>
-      </section>
-
-      <section id="grownups-screen" class="screen" aria-labelledby="grownups-title">
-        <div class="section-title"><div><p class="eyebrow">FOR GROWN-UPS</p><h2 id="grownups-title">Learning snapshot</h2></div><span>🌱</span></div>
-        <div class="parent-callout"><b>Personalised from the school check-in</b><p>Priority practice: t, n, c, k, ck, e, u and i; CVC blending; simple spelling; and the tricky words to, the, no, go and I. The game also adapts to answers over time.</p></div>
-        <div id="skill-stats" class="skill-stats"></div>
-        <div class="parent-tip"><span>💡</span><div><b>Try this away from the screen</b><p id="parent-tip-copy">Stretch each sound with your fingers, then sweep your hand to blend the word.</p></div></div>
-        <p class="audio-credit">Pure phoneme recordings: Wikimedia Commons contributors, via <a href="https://github.com/Nico-Sanchez/schwa" target="_blank" rel="noreferrer">Schwa</a>, licensed CC BY-SA 3.0.</p>
-        <button id="reset-progress" class="text-button" type="button">Reset learning progress</button>
-      </section>
-
-      <section id="result-screen" class="screen" aria-labelledby="result-title">
-        <article class="result-card">
-          <div class="result-art" aria-hidden="true"><span>🐻</span><i>🌼</i><i>🌟</i><i>🍎</i></div>
-          <p class="eyebrow">PICNIC COMPLETE</p>
-          <h2 id="result-title">You made the sounds sing!</h2>
-          <p id="result-copy">You listened, blended and kept trying.</p>
-          <div id="sound-badges" class="sound-badges"></div>
-          <button id="play-again" class="primary-button" type="button"><span>Play again</span><small>a fresh mix of sounds</small></button>
-          <button class="soft-button" type="button" data-go="map-screen">See my sound map</button>
-        </article>
+        <div id="puzzle" class="puzzle-grid" data-size="5" aria-label="25-cell 5×5 puzzle board"></div>
+        <p id="live-status" aria-live="polite" aria-atomic="true"></p>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Main menu">
-      <button class="is-current" type="button" data-go="home-screen"><span>🏡</span>Picnic</button>
-      <button type="button" data-go="map-screen"><span>🗺️</span>Sound map</button>
-      <button type="button" data-go="grownups-screen"><span>🌱</span>Grown-ups</button>
-    </nav>
-    <script defer src="./src/learning.js?v=2026111202"></script>
-    <script defer src="./src/app.js?v=2026111202"></script>
+    <dialog id="completion-dialog" aria-labelledby="completion-title">
+      <h2 id="completion-title">Puzzle complete!</h2>
+      <p>You completed the <strong id="final-difficulty">5×5</strong> puzzle in <strong id="final-moves">0</strong> moves and <strong id="final-time">0:00</strong>.</p>
+      <p id="completion-achievements" class="completion-achievements" hidden></p>
+      <div class="dialog-actions">
+        <button id="replay-button" type="button">Play again</button>
+        <button id="next-difficulty-button" class="secondary-button" type="button">Next difficulty</button>
+      </div>
+    </dialog>
+
+    <footer>
+      <p>Made with original artwork. No account, upload, or internet connection is needed after the page loads.</p>
+    </footer>
+
+    <script type="module" src="./src/app.js"></script>
   </body>
 </html>
