@@ -1,7 +1,7 @@
 name: Check full edition
 on:
   push:
-    branches: [main]
+    branches: [main, ai-for-future]
   pull_request:
 permissions:
   contents: read
