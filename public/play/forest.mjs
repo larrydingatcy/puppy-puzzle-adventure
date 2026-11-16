@@ -1,0 +1,38 @@
+export default [
+  {
+    "id": "first",
+    "check": "first",
+    "zh": "问出第一个问题",
+    "en": "Ask your first question"
+  },
+  {
+    "id": "why",
+    "check": "why",
+    "zh": "问一个为什么",
+    "en": "Ask why"
+  },
+  {
+    "id": "follow",
+    "check": "follow3",
+    "zh": "连续追问三次",
+    "en": "Ask three follow-up questions"
+  },
+  {
+    "id": "if",
+    "check": "if",
+    "zh": "问一个如果",
+    "en": "Ask what if"
+  },
+  {
+    "id": "doubt",
+    "check": "doubtReason",
+    "zh": "说真的吗，并给出理由",
+    "en": "Question an answer and give a reason"
+  },
+  {
+    "id": "compare",
+    "check": "compareReason",
+    "zh": "比较两种说法并给出选择",
+    "en": "Compare two ideas and explain your choice"
+  }
+];

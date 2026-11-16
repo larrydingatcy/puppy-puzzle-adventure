@@ -1,9 +1,7 @@
 {
-  "name": "puppy-puzzle-adventure",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test",
-    "test:browser": "node tests/gameplay.browser.mjs"
-  }
+  "name":"ai-for-future","version":"0.1.0","private":true,"type":"module",
+  "engines":{"node":">=22.13"},
+  "scripts":{"postinstall":"prisma generate","dev":"node scripts/content.mjs && next dev -H 0.0.0.0","build":"node scripts/content.mjs && next build","start":"next start -H 0.0.0.0","db:setup":"prisma db push","test":"node scripts/content.mjs && node --test","pages":"node scripts/content.mjs && node scripts/pages.mjs"},
+  "dependencies":{"@prisma/client":"6.19.0","next":"16.2.6","react":"19.2.7","react-dom":"19.2.7"},
+  "devDependencies":{"prisma":"6.19.0","typescript":"5.9.3","@types/node":"22","@types/react":"19","@types/react-dom":"19"}
 }

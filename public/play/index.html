@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f5e9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>AI for Future</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon.png">
+<link rel="icon" href="./icon.png">
+<link rel="stylesheet" href="./style.css">
+<script type="module" src="./ui.mjs"></script>
+</head>
+<body>
+<header class="top">
+  <button class="brand" data-action="home"><span aria-hidden="true">✦</span> AI for Future</button>
+  <nav aria-label="Navigation">
+    <button data-action="language" id="language">中 / EN</button>
+    <button data-action="shelf" id="shelf" aria-label="Collection">★ <span id="stars">0</span></button>
+    <button data-action="shop" aria-label="奖励商店 / Shop">🎁</button>
+    <button data-action="parent" aria-label="家长 / Parent">⚙</button>
+  </nav>
+</header>
+<main id="app" aria-busy="true"></main>
+<div id="notice" role="status" aria-live="polite"></div>
+<div id="burst" aria-hidden="true"></div>
+<dialog id="dialog"></dialog>
+</body>
+</html>

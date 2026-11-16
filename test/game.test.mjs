@@ -1,0 +1,48 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { create, apply, catalog, questionType } from '../public/play/game.mjs';
+const date = '2026-11-16';
+test('mission rewards are immediate and approval is idempotent', () => {
+  const s = create();
+  const move = (kind, data={}) => apply(s,{kind,...data},date);
+  move('visit'); move('start',{id:catalog[0].id});
+  move('evaluate',{input:'植物需要浇水',evaluation:{stars:1}});
+  move('card',{source:'family',input:'每周观察土壤'});
+  move('card',{source:'observe',input:'土很干'});
+  move('evaluate',{input:'做一个提醒卡',evaluation:{stars:2}});
+  move('advance');
+  move('evaluate',{input:'标记清楚，下次用颜色',image:'photo',evaluation:{stars:2,bigStars:3}});
+  assert.equal(s.stars,8);
+  assert.equal(s.pending.length,1);
+  assert.throws(()=>move('start',{id:catalog[1].id}));
+  const id=s.pending[0].id;
+  move('approve',{id});
+  assert.equal(s.stars,11);
+  assert.throws(()=>move('approve',{id}));
+  move('start',{id:catalog[1].id});
+});
+test('streak, spending, and limits', () => {
+  const s=create();
+  for(let i=10;i<=16;i++) apply(s,{kind:'visit'},'2026-11-'+i);
+  apply(s,{kind:'visit'},date);
+  assert.equal(s.stars,12);
+  s.rewards=[{id:'r',name:'故事',cost:10}];
+  apply(s,{kind:'redeem',id:'r'},date);
+  assert.throws(()=>apply(s,{kind:'redeem',id:'r'},date));
+  apply(s,{kind:'approve',id:s.pending[0].id},date);
+  assert.equal(s.stars,2);
+  apply(s,{kind:'time',seconds:1800},date);
+  assert.throws(()=>apply(s,{kind:'ask',input:'why?'},date));
+});
+test('question order and reasoning gates',()=>{
+  const s=create();
+  const ask=(input,extra={})=> apply(s,{kind:'ask',input,evaluation:{stars:1,...extra}},date);
+  assert.equal(questionType('What if it rains?'),'if');
+  ask('What is that?'); ask('为什么？');
+  ask('Why?',{followup:true}); ask('And then?',{followup:true}); ask('How?',{followup:true});
+  ask('如果下雨会怎样？'); ask('真的吗？');
+  assert.equal(s.forest.level,4);
+  ask('真的吗？因为我看见过',{reason:true});
+  ask('I pick the first because I saw it',{reason:true,compare:true});
+  assert.equal(s.forest.level,6);
+});

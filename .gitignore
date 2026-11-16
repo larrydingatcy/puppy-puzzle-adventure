@@ -1,1 +1,8 @@
-.worktrees/
+node_modules/
+.next/
+out/
+.env
+*.db
+*.db-*
+*.tsbuildinfo
+next-env.d.ts

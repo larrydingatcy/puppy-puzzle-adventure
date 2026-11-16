@@ -1,0 +1,337 @@
+export default [
+  {
+    "id": "plant",
+    "title_zh": "植物喝水提醒",
+    "title_en": "A Water Reminder",
+    "brief_zh": "给阳台植物做一个浇水提醒。先问家人什么时候该检查土。",
+    "brief_en": "Make a watering reminder for a balcony plant. Ask a grown-up when to check its soil.",
+    "difficulty": 1,
+    "unlock_requires": [],
+    "understand_check": {
+      "zh": [
+        "植物、浇水、提醒"
+      ],
+      "en": [
+        "plant, watering, reminder"
+      ]
+    },
+    "info_hints": {
+      "zh": [
+        "土摸起来干还是湿？"
+      ],
+      "en": [
+        "Does the soil feel dry or wet?"
+      ]
+    },
+    "plan_rubric": {
+      "zh": [
+        "提醒放在哪里？"
+      ],
+      "en": [
+        "Where will you put the reminder?"
+      ]
+    },
+    "result_rubric": {
+      "zh": [
+        "提醒能看到，说明何时检查土。"
+      ],
+      "en": [
+        "The reminder is visible and shows when to check the soil."
+      ]
+    },
+    "reflection_prompts": {
+      "zh": [
+        "什么做得好？",
+        "什么没成功？",
+        "下次怎么改？"
+      ],
+      "en": [
+        "What went well?",
+        "What did not work?",
+        "What would you change?"
+      ]
+    },
+    "est_minutes": 15
+  },
+  {
+    "id": "sorting",
+    "title_zh": "垃圾分类标签",
+    "title_en": "Sorting Signs",
+    "brief_zh": "做两张标签，帮家人把垃圾放到合适的桶里。",
+    "brief_en": "Make two signs that help your family put things in the right bins.",
+    "difficulty": 1,
+    "unlock_requires": [
+      "plant"
+    ],
+    "understand_check": {
+      "zh": [
+        "两张标签、分类、垃圾桶"
+      ],
+      "en": [
+        "two signs, sorting, bins"
+      ]
+    },
+    "info_hints": {
+      "zh": [
+        "问问家里的桶怎么用。"
+      ],
+      "en": [
+        "Ask how your family uses its bins."
+      ]
+    },
+    "plan_rubric": {
+      "zh": [
+        "标签的图画能区分两类东西。"
+      ],
+      "en": [
+        "The pictures show two different types of waste."
+      ]
+    },
+    "result_rubric": {
+      "zh": [
+        "家人能用标签把一件东西放对。"
+      ],
+      "en": [
+        "A family member can sort an item using the signs."
+      ]
+    },
+    "reflection_prompts": {
+      "zh": [
+        "什么做得好？",
+        "什么没成功？",
+        "下次怎么改？"
+      ],
+      "en": [
+        "What went well?",
+        "What did not work?",
+        "What would you change?"
+      ]
+    },
+    "est_minutes": 20
+  },
+  {
+    "id": "shop",
+    "title_zh": "家庭小卖部",
+    "title_en": "Family Shop",
+    "brief_zh": "开一个家庭小卖部。挑几件物品、写价格，再做一张海报。",
+    "brief_en": "Open a family shop. Pick some items, choose prices, and make a poster.",
+    "difficulty": 2,
+    "unlock_requires": [
+      "sorting"
+    ],
+    "understand_check": {
+      "zh": [
+        "商品、价格、海报"
+      ],
+      "en": [
+        "items, prices, poster"
+      ]
+    },
+    "info_hints": {
+      "zh": [
+        "问问顾客想买什么。"
+      ],
+      "en": [
+        "Ask a customer what they want."
+      ]
+    },
+    "plan_rubric": {
+      "zh": [
+        "商品、价格和海报都能看懂。"
+      ],
+      "en": [
+        "The items, prices and poster are clear."
+      ]
+    },
+    "result_rubric": {
+      "zh": [
+        "试着和家人用假钱完成一次买卖。"
+      ],
+      "en": [
+        "Try one sale with a family member using pretend money."
+      ]
+    },
+    "reflection_prompts": {
+      "zh": [
+        "什么做得好？",
+        "什么没成功？",
+        "下次怎么改？"
+      ],
+      "en": [
+        "What went well?",
+        "What did not work?",
+        "What would you change?"
+      ]
+    },
+    "est_minutes": 25
+  },
+  {
+    "id": "breakfast",
+    "title_zh": "早餐菜单",
+    "title_en": "Breakfast Menu",
+    "brief_zh": "给家人做一份早餐菜单。问问他们喜欢什么、有什么不能吃。",
+    "brief_en": "Make a breakfast menu for your family. Ask what they like and what they cannot eat.",
+    "difficulty": 1,
+    "unlock_requires": [
+      "plant"
+    ],
+    "understand_check": {
+      "zh": [
+        "给家人、早餐、菜单"
+      ],
+      "en": [
+        "family, breakfast, menu"
+      ]
+    },
+    "info_hints": {
+      "zh": [
+        "问家人有什么食物要避开。"
+      ],
+      "en": [
+        "Ask which foods your family needs to avoid."
+      ]
+    },
+    "plan_rubric": {
+      "zh": [
+        "菜单考虑家人的喜好和限制。"
+      ],
+      "en": [
+        "The menu considers preferences and foods to avoid."
+      ]
+    },
+    "result_rubric": {
+      "zh": [
+        "给家人看菜单，并听听他们的意见。"
+      ],
+      "en": [
+        "Show the menu to family and listen to their feedback."
+      ]
+    },
+    "reflection_prompts": {
+      "zh": [
+        "什么做得好？",
+        "什么没成功？",
+        "下次怎么改？"
+      ],
+      "en": [
+        "What went well?",
+        "What did not work?",
+        "What would you change?"
+      ]
+    },
+    "est_minutes": 15
+  },
+  {
+    "id": "bridge",
+    "title_zh": "纸桥挑战",
+    "title_en": "Paper Bridge",
+    "brief_zh": "用纸搭一座桥，看看它能不能撑住一本书。",
+    "brief_en": "Build a bridge from paper and see if it can hold one book.",
+    "difficulty": 3,
+    "unlock_requires": [
+      "shop",
+      "breakfast"
+    ],
+    "understand_check": {
+      "zh": [
+        "纸桥、一本书、测试"
+      ],
+      "en": [
+        "paper bridge, one book, test"
+      ]
+    },
+    "info_hints": {
+      "zh": [
+        "平纸和折过的纸，哪个更挺？"
+      ],
+      "en": [
+        "Which feels stiffer, flat paper or folded paper?"
+      ]
+    },
+    "plan_rubric": {
+      "zh": [
+        "说清楚怎么折纸、怎么撑住两头。"
+      ],
+      "en": [
+        "Explain how you fold the paper and support its ends."
+      ]
+    },
+    "result_rubric": {
+      "zh": [
+        "试放一本书，说说桥有没有撑住。"
+      ],
+      "en": [
+        "Try one book and describe whether the bridge held it."
+      ]
+    },
+    "reflection_prompts": {
+      "zh": [
+        "什么做得好？",
+        "什么没成功？",
+        "下次怎么改？"
+      ],
+      "en": [
+        "What went well?",
+        "What did not work?",
+        "What would you change?"
+      ]
+    },
+    "est_minutes": 20
+  },
+  {
+    "id": "trip",
+    "title_zh": "出游背包",
+    "title_en": "Trip Backpack",
+    "brief_zh": "选一次家庭出游，想想要带什么，再画或摆出要带的东西。",
+    "brief_en": "Pick a family outing. Think about what to pack, then draw or lay out the items.",
+    "difficulty": 2,
+    "unlock_requires": [
+      "bridge"
+    ],
+    "understand_check": {
+      "zh": [
+        "出游、地点、要带的东西"
+      ],
+      "en": [
+        "outing, destination, items to pack"
+      ]
+    },
+    "info_hints": {
+      "zh": [
+        "问家人会去哪里，看看天气。"
+      ],
+      "en": [
+        "Ask where you are going and check the weather."
+      ]
+    },
+    "plan_rubric": {
+      "zh": [
+        "要带的东西适合地点和天气。"
+      ],
+      "en": [
+        "The items fit the place and weather."
+      ]
+    },
+    "result_rubric": {
+      "zh": [
+        "展示物品，并说出其中一件为什么要带。"
+      ],
+      "en": [
+        "Show the items and explain why one is needed."
+      ]
+    },
+    "reflection_prompts": {
+      "zh": [
+        "什么做得好？",
+        "什么没成功？",
+        "下次怎么改？"
+      ],
+      "en": [
+        "What went well?",
+        "What did not work?",
+        "What would you change?"
+      ]
+    },
+    "est_minutes": 20
+  }
+];
