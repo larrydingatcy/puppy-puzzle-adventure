@@ -19,3 +19,29 @@ jobs:
       - run: npm test
       - run: npm run db:setup
       - run: npm run build
+      - name: Smoke test Next.js and SQLite
+        run: |
+          npm start -- --port 3001 > /tmp/future-server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:3001/api/game > /dev/null; then break; fi
+            sleep 1
+          done
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const url = 'http://localhost:3001/api/game';
+          async function post(action) {
+            return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(action) });
+          }
+          assert.equal((await fetch(url)).status, 200);
+          assert.equal((await post({ kind: 'approve', id: 'missing' })).status, 403);
+          assert.equal((await (await post({ kind: 'visit' })).json()).state.stars, 1);
+          assert.equal((await (await post({ kind: 'start', id: 'plant' })).json()).state.active.step, 1);
+          assert.equal((await (await fetch(url)).json()).state.active.id, 'plant');
+          NODE
+      - run: npm run pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-for-future-demo
+          path: out/
